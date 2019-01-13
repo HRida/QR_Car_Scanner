@@ -8,21 +8,23 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
 import android.view.View.OnClickListener;
 import android.app.AlertDialog.Builder;
+import android.widget.ImageView;
 import android.widget.Toast;
 import com.google.zxing.integration.android.IntentIntegrator;
 import com.google.zxing.integration.android.IntentResult;
 
 public class MainActivity extends AppCompatActivity implements OnClickListener {
 
-    EditText ID,FName,LName,CarModule,CheckUp;
-    Button Add,Delete,View,ViewAll,Scan,Modify;
-    SQLiteDatabase db;
+    private EditText ID,FName,LName,CarModule,CheckUp;
+    private Button Add,Delete,View,ViewAll,Scan,Modify;
+    private ImageView iv1;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,6 +36,8 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         LName = (EditText) findViewById(R.id.editLName);
         CarModule = (EditText) findViewById(R.id.editCar);
         CheckUp = (EditText) findViewById(R.id.editLastCheck);
+
+        iv1 = (ImageView)findViewById(R.id.iv1);
 
         Add = (Button) findViewById(R.id.btnAdd);
         Delete = (Button) findViewById(R.id.btnDelete);
@@ -48,9 +52,6 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         ViewAll.setOnClickListener(this);
         Scan.setOnClickListener(this);
         Modify.setOnClickListener(this);
-
-        db = openOrCreateDatabase("CarDB", Context.MODE_PRIVATE, null);
-        db.execSQL("CREATE TABLE IF NOT EXISTS car(ID VARCHAR, FName VARCHAR, LNAME VARCHAR, CAR_MODULE VARCHAR, DATE_CHECKUP VARCHAR);");
     }
 
     public void showMessage(String title, String message){
@@ -72,22 +73,8 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
 
     public void onClick(View v) {
 
-        String QuerySelectID = "SELECT * FROM car where ID='"+ID.getText()+"'",
-                QueryDeleteID = "DELETE FROM car WHERE ID='"+ ID.getText()+"'",
-                QueryInsert = "INSERT INTO car VALUES('"+ID.getText()+"','"+FName.getText()+"','"+LName.getText()+"','"+CarModule.getText()+"','"+CheckUp.getText()+"');",
-                QuerySelectAll ="SELECT * FROM car",
-                QueryUpdate ="UPDATE car SET DATE_CHECKUP='"+CheckUp.getText()+"'WHERE ID='"+ID.getText()+"'";
-
-
-
         if(v == Add)
         {
-            Cursor c = db.rawQuery(QuerySelectID,null );
-            if(c.getCount()>0)
-            {
-                showMessage("Error : User Already Registered ", "The username is already registered");
-                return;
-            }
             if(ID.getText().toString().trim().length() == 0
                     || FName.getText().toString().trim().length() == 0
                     || LName.getText().toString().trim().length() == 0
@@ -97,28 +84,25 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                 showMessage("Error", "Please enter all values");
                 return;
             }
-            db.execSQL(QueryInsert);
-            showMessage("Success", "Record added");
-            clearText();
+            else {
+                ShopDatabase db = new ShopDatabase(MainActivity.this);
+                db.setKey("HRida");
+                try {
+                    int id = Integer.parseInt(ID.getText().toString());
+                    String Fname = FName.getText().toString();
+                    String Lname = LName.getText().toString();
+                    String CarMod = CarModule.getText().toString();
+                    String Check = CheckUp.getText().toString();
+                    db.addCustomer(new Customer(id, Fname, Lname, CarMod, Check));
+                } catch (Exception ex) {
+                    Toast.makeText(MainActivity.this, ex.getMessage(), Toast.LENGTH_SHORT).show();
+                }
+                clearText();
+            }
         }
         if(v == ViewAll)
         {
-            Cursor c = db.rawQuery(QuerySelectAll, null);
-            if(c.getCount() == 0)
-            {
-                showMessage("Error", "No records found");
-                return;
-            }
-            StringBuffer buffer = new StringBuffer();
-            while(c.moveToNext())
-            {
-                buffer.append("ID: "+c.getString(0)+"\n");
-                buffer.append("FName: "+c.getString(1)+"\n");
-                buffer.append("LName: "+c.getString(2)+"\n");
-                buffer.append("Car Module: "+c.getString(3)+"\n");
-                buffer.append("Checkup Date: "+c.getString(4)+"\n\n");
-            }
-            showMessage("Car Details", buffer.toString());
+            startActivity(new Intent(MainActivity.this, GetAllCustomers.class));
         }
         if(v == View)
         {
@@ -127,18 +111,14 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                 showMessage("Error", "Please enter ID");
                 return;
             }
-            Cursor c = db.rawQuery(QuerySelectID, null);
-            if(c.moveToFirst())
-            {
-                FName.setText(c.getString(1));
-                LName.setText(c.getString(2));
-                CarModule.setText(c.getString(3));
-                CheckUp.setText(c.getString(4));
+            try {
+                int id = Integer.parseInt(ID.getText().toString());
+                ShopDatabase db = new ShopDatabase(MainActivity.this);
+                db.getCustomerName(id);
+                db.updateImage(iv1);
             }
-            else
-            {
-                showMessage("Error", "Invalid ID");
-                clearText();
+            catch (Exception ex) {
+                Log.w("error", ex.getMessage());
             }
         }
         if(v == Delete)
@@ -148,21 +128,14 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
                 showMessage("Error", "Please enter ID");
                 return;
             }
-            Cursor c = db.rawQuery(QuerySelectID, null);
-            if(c.getCount() == 0)
-            {
-                showMessage("Error", "No records found");
-                return;
+            try {
+                ShopDatabase db = new ShopDatabase(MainActivity.this);
+                int id = Integer.parseInt(ID.getText().toString());
+                db.setKey("HRida");
+                db.deleteData(id);
             }
-            if(c.moveToFirst())
-            {
-                db.execSQL(QueryDeleteID);
-                showMessage("Success", "Record Deleted");
-            }
-            else
-            {
-                showMessage("Error", "Invalid ID");
-                clearText();
+            catch (Exception ex) {
+                Log.w("error", ex.getMessage());
             }
         }
         if(v == Scan)
@@ -177,20 +150,24 @@ public class MainActivity extends AppCompatActivity implements OnClickListener {
         }
         if(v == Modify)
         {
+
             if(ID.getText().toString().trim().length() == 0)
             {
                 showMessage("Error", "Please enter ID");
                 return;
             }
-            Cursor c = db.rawQuery(QuerySelectID, null);
-            if(c.moveToFirst())
-            {
-                db.execSQL(QueryUpdate);
-                showMessage("Success", "Record Modified");
+            try {
+                ShopDatabase db = new ShopDatabase(MainActivity.this);
+                int id = Integer.parseInt(ID.getText().toString());
+                String Fname = FName.getText().toString();
+                String Lname = LName.getText().toString();
+                String CarMod = CarModule.getText().toString();
+                String Check = CheckUp.getText().toString();
+                db.setKey("HRida");
+                db.updateData(id, new temp(Fname, Lname, CarMod, Check));
             }
-            else
-            {
-                showMessage("Error", "Invalid ID");
+            catch (Exception ex) {
+                Log.w("error", ex.getMessage());
             }
             clearText();
         }

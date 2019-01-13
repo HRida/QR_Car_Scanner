@@ -1,21 +1,33 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout
+<RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:paddingBottom="16dp"
+    android:paddingLeft="16dp"
+    android:paddingRight="16dp"
+    android:paddingTop="16dp"
     tools:context=".MainActivity"
     android:background="@drawable/back">
+
+    <ImageView
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:layout_centerHorizontal="true"
+        android:id="@+id/iv1" />
 
     <EditText
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:inputType="number"
-        android:hint="ID"
+        android:hint="Enter Customer ID"
         android:id="@+id/editID"
-        android:textColor="#c41818" />
+        android:textColor="#c41818"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/iv1"
+        android:layout_marginTop="20dp"/>
 
     <EditText
         android:layout_width="fill_parent"
@@ -23,7 +35,9 @@
         android:inputType="text"
         android:hint="First Name"
         android:id="@+id/editFName"
-        android:textColor="#c41818" />
+        android:textColor="#c41818"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/editID"/>
 
     <EditText
         android:layout_width="fill_parent"
@@ -31,7 +45,9 @@
         android:inputType="text"
         android:hint="Last Name"
         android:id="@+id/editLName"
-        android:textColor="#c41818" />
+        android:textColor="#c41818"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/editFName"/>
 
     <EditText
         android:id="@+id/editCar"
@@ -39,7 +55,9 @@
         android:layout_height="wrap_content"
         android:hint="Car Module"
         android:inputType="text"
-        android:textColor="#c41818" />
+        android:textColor="#c41818"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/editLName"/>
 
     <EditText
         android:layout_width="fill_parent"
@@ -47,42 +65,62 @@
         android:inputType="date"
         android:hint="Checkup Date"
         android:id="@+id/editLastCheck"
-        android:textColor="#c41818" />
+        android:textColor="#c41818"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/editCar"/>
 
     <Button
         android:id="@+id/btnAdd"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Add" />
+        android:text="Add"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/editLastCheck"
+        android:layout_marginTop="15dp"/>
 
     <Button
         android:id="@+id/btnModify"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Modify" />
+        android:text="Modify"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/editLastCheck"
+        android:layout_marginTop="15dp"/>
 
     <Button
         android:id="@+id/btnDelete"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Delete" />
+        android:text="Delete"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/editLastCheck"
+        android:layout_marginTop="15dp"/>
 
     <Button
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="View"
-        android:id="@+id/btnView" />
+        android:id="@+id/btnView"
+        android:layout_alignParentLeft="true"
+        android:layout_below="@+id/btnAdd"
+        android:layout_marginTop="15dp"/>
 
     <Button
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="View All"
-        android:id="@+id/btnViewAll" />
+        android:id="@+id/btnViewAll"
+        android:layout_centerHorizontal="true"
+        android:layout_below="@+id/btnAdd"
+        android:layout_marginTop="15dp"/>
 
     <Button
         android:id="@+id/btnScan"
-        android:layout_width="fill_parent"
+        android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Scan QR Code" />
+        android:text="Scan QR"
+        android:layout_alignParentRight="true"
+        android:layout_below="@+id/btnAdd"
+        android:layout_marginTop="15dp"/>
 
-</LinearLayout>
+</RelativeLayout>
